@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+</head>
+<body>
+    <h1>To-Do List</h1>
+
+    <!-- Task input box -->
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Enter a task" required>
+        <button type="submit">Create</button>
+    </form>
+
+    <!-- Task list -->
+    <ul>
+        {% for task in task %}
+           <li ="{% if task.completed %} text-decoration: line-through; {% endif %}">
+                {{ task.name }}
+                
+                <!-- Mark as done checkbox -->
+                <form method="POST" action="{% url 'mark_as_done' task.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="{% if task.completed %}Pending{% else %}Completed{% endif %}">
+                    <input type="checkbox" name="completed" id="status" {% if task.completed %}checked{% endif %} onchange="this.form.submit()">
+                </form>
+                
+                <!-- Delete task button -->
+                <form method="POST" action="{% url 'delete_task' task.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% empty %}
+            <li>No tasks yet!</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
