@@ -16,6 +16,7 @@
     </form>
 
     <!-- Task list -->
+    <h2>Tasks for {{ user_info.first_name }} {{user_info.last_name}} {{user_info.email}}</h2>
     <ul>
         {% for task in task %}
            <li ="{% if task.completed %} text-decoration: line-through; {% endif %}">
