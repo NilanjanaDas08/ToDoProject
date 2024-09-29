@@ -11,14 +11,14 @@ class User(models.Model):
     created_at=models.DateTimeField(auto_now=True)
     updated_at=models.DateTimeField(auto_now=True)
 
-def __str__(self):
-    return f"{self.name}"
+    def __str__(self):
+      return f"{self.first_name}"
 
 
 class Task(models.Model):
-    User_id=models.ForeignKey(User,on_delete=models.CASCADE,default=1)
+    user=models.ForeignKey(User,on_delete=models.CASCADE,default=1)
     name=models.CharField(max_length=255)
     completed=models.BooleanField(default=False)
 
-def __str__(self):
-    return f"{self.name}"
+    def __str__(self):
+     return f"{self.name}"

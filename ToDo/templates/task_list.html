@@ -16,16 +16,15 @@
     </form>
 
     <!-- Task list -->
-    <h2>Tasks for {{ user_info.first_name }} {{user_info.last_name}} {{user_info.email}}</h2>
-    <ul>
-        {% for task in task %}
-           <li ="{% if task.completed %} text-decoration: line-through; {% endif %}">
+<h2>Tasks for {{ user_info.first_name }} {{ user_info.last_name }}</h2>
+<ul>
+    {% if tasks %}
+        {% for task in tasks %}
+            <li>
                 {{ task.name }}
-                
                 <!-- Mark as done checkbox -->
                 <form method="POST" action="{% url 'mark_as_done' task.id %}" style="display:inline;">
                     {% csrf_token %}
-                    <input type="hidden" name="status" value="{% if task.completed %}Pending{% else %}Completed{% endif %}">
                     <input type="checkbox" name="completed" id="status" {% if task.completed %}checked{% endif %} onchange="this.form.submit()">
                 </form>
                 
@@ -35,9 +34,11 @@
                     <button type="submit">Delete</button>
                 </form>
             </li>
-        {% empty %}
-            <li>No tasks yet!</li>
         {% endfor %}
-    </ul>
+    {% else %}
+        <li>No tasks yet!</li>
+    {% endif %}
+</ul>
+<a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
 </body>
 </html>

@@ -11,12 +11,12 @@ def register(request):
       email=request.POST.get('email')
       password=request.POST.get('password')
       if User.objects.filter(email=email).exists():
-       print("Already exists")
-       return HttpResponse("Already exists")
+         print("Already exists")
+         return HttpResponse("Already exists")
       else:
-        hashed_password = make_password(password)
-        user=User.objects.create(first_name=first_name,last_name=last_name,email=email,password=hashed_password)
-        return redirect('login')
+         hashed_password = make_password(password)
+         user=User.objects.create(first_name=first_name,last_name=last_name,email=email,password=hashed_password)
+         return redirect('login')
    return render(request,'register.html')
    
 def login(request):
@@ -41,22 +41,46 @@ def login(request):
        config['errors']='Invalid username or password'
    return render(request,'login.html',config)
 
-   
 def task_list(request):
+    user_info = request.session['user']
+    user_id = user_info['id']
+    
+    # Get the user instance using the user_id
+    user_instance = User.objects.get(id=user_id)
+    
+    # Filter tasks using the user instance
+    tasks = Task.objects.filter(user=user_instance)
+    
+    if request.method == "POST":
+        name = request.POST.get('name')
+        if name:
+            # Check for duplicate tasks by name for the user instance
+            if Task.objects.filter(name=name, user=user_instance).exists():  # Duplicate entry check
+                print("Already exists")
+            else:
+                # Create a new task associated with the user instance
+                Task.objects.create(name=name, user=user_instance)
+                return redirect('task_list')
+    
+    return render(request, 'task_list.html', {'tasks': tasks, 'user_info': user_info})
+
+
+   
+'''def task_list(request):
     user_info=request.session['user']
     user_id=user_info['id']
-    task=Task.objects.filter(user_id=user_id)
+    tasks=Task.objects.filter(user_id=user_id)
     if request.method=="POST":
         name=request.POST.get('name')
         if name:
            # Task.objects.create(name=name)
-           Task.objects.filter(user__isnull=True).delete()
            if Task.objects.filter(name=name,user_id=user_id).count()>0: #Duplicate entry
              print("Already exists")
            else:
-             Task.objects.create(name=name,user_id=user_id)
+             user_instance = User.objects.get(id=user_id)
+             Task.objects.create(name=name,user=user_instance)
              return redirect('task_list')
-    return render(request,'task_list.html',{'task':task},{'user_info':user_info})
+    return render(request,'task_list.html',{'tasks':tasks,'user_info':user_info})'''
 
 def mark_as_done(request,task_id):
    task=Task.objects.get(id=task_id)
@@ -68,3 +92,10 @@ def delete_task(request,task_id):
    task=Task.objects.get(id=task_id)
    task.delete()
    return redirect('task_list')
+
+def logout(request):
+   try:
+      del request.session['user']
+   except:
+      pass
+   return redirect('login')
